@@ -17,7 +17,7 @@
   "annotations": {
     "list": []
   },
-  "description": "Ticket Application — visão geral dos microserviços: event-service, order-service e notification-service",
+  "description": "Ticket Application \u2014 vis\u00e3o geral dos microservi\u00e7os: event-service, order-service e notification-service",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -34,7 +34,7 @@
         "y": 0
       },
       "id": 100,
-      "title": "🎟️ Negócio — Vendas & Pedidos",
+      "title": "Neg\u00f3cio \u2014 Vendas & Pedidos",
       "type": "row"
     },
     {
@@ -224,7 +224,7 @@
           "sort": "none"
         }
       },
-      "title": "Taxa de criação de pedidos (req/s)",
+      "title": "Taxa de cria\u00e7\u00e3o de pedidos (req/s)",
       "type": "timeseries",
       "targets": [
         {
@@ -326,7 +326,7 @@
         "y": 9
       },
       "id": 101,
-      "title": "🚦 HTTP — Latência & Taxa de Erros",
+      "title": "HTTP \u2014 Lat\u00eancia & Taxa de Erros",
       "type": "row"
     },
     {
@@ -372,23 +372,13 @@
           "sort": "none"
         }
       },
-      "title": "Latência HTTP p50 / p95 / p99 — order-service",
+      "title": "Lat\u00eancia HTTP (m\u00e9dia/p95/p99) \u2014 order-service",
       "type": "timeseries",
       "targets": [
         {
-          "expr": "histogram_quantile(0.50, sum by(le) (rate(http_server_requests_seconds_bucket{job=\"order-service\"}[2m])))",
-          "legendFormat": "p50",
+          "expr": "sum by(uri) (rate(http_server_requests_seconds_sum{job=\"order-service\", uri!~\"/actuator.*\"}[2m])) / sum by(uri) (rate(http_server_requests_seconds_count{job=\"order-service\", uri!~\"/actuator.*\"}[2m]))",
+          "legendFormat": "{{uri}}",
           "refId": "A"
-        },
-        {
-          "expr": "histogram_quantile(0.95, sum by(le) (rate(http_server_requests_seconds_bucket{job=\"order-service\"}[2m])))",
-          "legendFormat": "p95",
-          "refId": "B"
-        },
-        {
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(http_server_requests_seconds_bucket{job=\"order-service\"}[2m])))",
-          "legendFormat": "p99",
-          "refId": "C"
         }
       ]
     },
@@ -435,23 +425,13 @@
           "sort": "none"
         }
       },
-      "title": "Latência HTTP p50 / p95 / p99 — event-service (nginx-lb)",
+      "title": "Lat\u00eancia HTTP (m\u00e9dia/p95/p99) \u2014 event-service (nginx-lb)",
       "type": "timeseries",
       "targets": [
         {
-          "expr": "histogram_quantile(0.50, sum by(le) (rate(http_server_requests_seconds_bucket{job=~\"event-service.*\"}[2m])))",
-          "legendFormat": "p50",
+          "expr": "sum by(uri) (rate(http_server_requests_seconds_sum{job=~\"event-service.*\", uri!~\"/actuator.*\"}[2m])) / sum by(uri) (rate(http_server_requests_seconds_count{job=~\"event-service.*\", uri!~\"/actuator.*\"}[2m]))",
+          "legendFormat": "{{uri}}",
           "refId": "A"
-        },
-        {
-          "expr": "histogram_quantile(0.95, sum by(le) (rate(http_server_requests_seconds_bucket{job=~\"event-service.*\"}[2m])))",
-          "legendFormat": "p95",
-          "refId": "B"
-        },
-        {
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(http_server_requests_seconds_bucket{job=~\"event-service.*\"}[2m])))",
-          "legendFormat": "p99",
-          "refId": "C"
         }
       ]
     },
@@ -514,23 +494,28 @@
           "sort": "none"
         }
       },
-      "title": "Taxa de Erros HTTP (5xx) por serviço",
+      "title": "Taxa de Erros HTTP (5xx) e (4xx) por servi\u00e7o",
       "type": "timeseries",
       "targets": [
         {
-          "expr": "sum(rate(http_server_requests_seconds_count{job=\"order-service\", status=~\"5..\"}[1m])) / sum(rate(http_server_requests_seconds_count{job=\"order-service\"}[1m]))",
-          "legendFormat": "order-service",
+          "expr": "sum(rate(http_server_requests_seconds_count{job=\"order-service\", outcome=\"SERVER_ERROR\"}[1m]))",
+          "legendFormat": "order-service 5xx",
           "refId": "A"
         },
         {
-          "expr": "sum(rate(http_server_requests_seconds_count{job=~\"event-service.*\", status=~\"5..\"}[1m])) / sum(rate(http_server_requests_seconds_count{job=~\"event-service.*\"}[1m]))",
-          "legendFormat": "event-service",
+          "expr": "sum(rate(http_server_requests_seconds_count{job=~\"event-service.*\", outcome=\"SERVER_ERROR\"}[1m]))",
+          "legendFormat": "event-service 5xx",
           "refId": "B"
         },
         {
-          "expr": "sum(rate(http_server_requests_seconds_count{job=\"notification-service\", status=~\"5..\"}[1m])) / sum(rate(http_server_requests_seconds_count{job=\"notification-service\"}[1m]))",
-          "legendFormat": "notification-service",
+          "expr": "sum(rate(http_server_requests_seconds_count{job=\"notification-service\", outcome=\"SERVER_ERROR\"}[1m]))",
+          "legendFormat": "notification-service 5xx",
           "refId": "C"
+        },
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{job=\"order-service\", outcome=\"CLIENT_ERROR\"}[1m]))",
+          "legendFormat": "order-service 4xx",
+          "refId": "D"
         }
       ]
     },
@@ -574,7 +559,7 @@
           "sort": "none"
         }
       },
-      "title": "Volume de requisições por status HTTP — todos os serviços",
+      "title": "Volume de requisi\u00e7\u00f5es por status HTTP \u2014 todos os servi\u00e7os",
       "type": "timeseries",
       "targets": [
         {
@@ -592,338 +577,8 @@
         "x": 0,
         "y": 26
       },
-      "id": 102,
-      "title": "⚡ Resilience4j — Circuit Breaker & Retry (order-service → payment-gateway)",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "text": "CLOSED",
-                  "color": "green"
-                },
-                "1": {
-                  "text": "OPEN",
-                  "color": "red"
-                },
-                "2": {
-                  "text": "HALF_OPEN",
-                  "color": "yellow"
-                }
-              },
-              "type": "value"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 1
-              },
-              {
-                "color": "red",
-                "value": 2
-              }
-            ]
-          },
-          "unit": "short"
-        }
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 0,
-        "y": 27
-      },
-      "id": 20,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "title": "Circuit Breaker Estado (gateway)",
-      "type": "stat",
-      "targets": [
-        {
-          "expr": "resilience4j_circuitbreaker_state{name=\"gateway\",state=\"closed\"} * 0 + resilience4j_circuitbreaker_state{name=\"gateway\",state=\"open\"} * 1 + resilience4j_circuitbreaker_state{name=\"gateway\",state=\"half_open\"} * 2",
-          "legendFormat": "Estado",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 30
-              },
-              {
-                "color": "red",
-                "value": 60
-              }
-            ]
-          },
-          "unit": "percent",
-          "min": 0,
-          "max": 100
-        }
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 4,
-        "y": 27
-      },
-      "id": 21,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "title": "Taxa de Falha do CB (%)",
-      "type": "stat",
-      "targets": [
-        {
-          "expr": "resilience4j_circuitbreaker_failure_rate{name=\"gateway\"}",
-          "legendFormat": "Falha %",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "showPoints": "never"
-          },
-          "unit": "short"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 16,
-        "x": 8,
-        "y": 27
-      },
-      "id": 22,
-      "options": {
-        "legend": {
-          "calcs": [
-            "sum"
-          ],
-          "displayMode": "table",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "title": "Chamadas Circuit Breaker por resultado",
-      "type": "timeseries",
-      "targets": [
-        {
-          "expr": "rate(resilience4j_circuitbreaker_calls_seconds_count{name=\"gateway\", kind=\"successful\"}[1m])",
-          "legendFormat": "Sucesso",
-          "refId": "A"
-        },
-        {
-          "expr": "rate(resilience4j_circuitbreaker_calls_seconds_count{name=\"gateway\", kind=\"failed\"}[1m])",
-          "legendFormat": "Falhou",
-          "refId": "B"
-        },
-        {
-          "expr": "rate(resilience4j_circuitbreaker_calls_seconds_count{name=\"gateway\", kind=\"not_permitted\"}[1m])",
-          "legendFormat": "Bloqueada (CB aberto)",
-          "refId": "C"
-        }
-      ]
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 10
-              },
-              {
-                "color": "red",
-                "value": 50
-              }
-            ]
-          },
-          "unit": "short"
-        }
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 0,
-        "y": 31
-      },
-      "id": 23,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "title": "Tentativas de Retry (total)",
-      "type": "stat",
-      "targets": [
-        {
-          "expr": "sum(resilience4j_retry_calls_total{name=\"gateway\", kind=\"failed_with_retry\"})",
-          "legendFormat": "Retries",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 1
-              }
-            ]
-          },
-          "unit": "short"
-        }
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 4,
-        "y": 31
-      },
-      "id": 24,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "title": "Falhas definitivas após retry",
-      "type": "stat",
-      "targets": [
-        {
-          "expr": "sum(resilience4j_retry_calls_total{name=\"gateway\", kind=\"failed_without_retry\"})",
-          "legendFormat": "Falhas",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 35
-      },
       "id": 103,
-      "title": "🐇 RabbitMQ — Mensageria Assíncrona",
+      "title": "RabbitMQ \u2014 Mensageria Ass\u00edncrona",
       "type": "row"
     },
     {
@@ -971,14 +626,19 @@
       "type": "timeseries",
       "targets": [
         {
-          "expr": "rate(spring_rabbitmq_template_published_total{job=\"order-service\"}[1m])",
+          "expr": "rate(rabbitmq_published_total{job=\"order-service\"}[1m])",
           "legendFormat": "Publicadas/s",
           "refId": "A"
         },
         {
-          "expr": "rate(spring_rabbitmq_template_publish_failed_total{job=\"order-service\"}[1m])",
-          "legendFormat": "Falhas de publicação/s",
+          "expr": "rate(rabbitmq_failed_to_publish_total{job=\"order-service\"}[1m])",
+          "legendFormat": "Falhas de publica\u00e7\u00e3o/s",
           "refId": "B"
+        },
+        {
+          "expr": "rate(rabbitmq_not_acknowledged_published_total{job=\"order-service\"}[1m])",
+          "legendFormat": "N\u00e3o confirmadas/s",
+          "refId": "C"
         }
       ]
     },
@@ -1027,14 +687,19 @@
       "type": "timeseries",
       "targets": [
         {
-          "expr": "rate(spring_rabbitmq_listener_messages_consumed_total{job=\"notification-service\"}[1m])",
-          "legendFormat": "Consumidas/s",
+          "expr": "rate(rabbitmq_acknowledged_total{job=\"notification-service\"}[1m])",
+          "legendFormat": "Consumidas (ack)/s",
           "refId": "A"
         },
         {
-          "expr": "rate(spring_rabbitmq_listener_messages_failed_total{job=\"notification-service\"}[1m])",
-          "legendFormat": "Falhas no consume/s",
+          "expr": "rate(rabbitmq_rejected_total{job=\"notification-service\"}[1m])",
+          "legendFormat": "Rejeitadas (DLQ)/s",
           "refId": "B"
+        },
+        {
+          "expr": "rate(rabbitmq_consumed_total{job=\"notification-service\"}[1m])",
+          "legendFormat": "Recebidas/s",
+          "refId": "C"
         }
       ]
     },
@@ -1047,7 +712,7 @@
         "y": 44
       },
       "id": 104,
-      "title": "🖥️ JVM — Memória & Threads",
+      "title": "JVM \u2014 Mem\u00f3ria & Threads",
       "type": "row"
     },
     {
@@ -1091,22 +756,22 @@
           "sort": "none"
         }
       },
-      "title": "Heap JVM usada por serviço",
+      "title": "Heap JVM usada por servi\u00e7o",
       "type": "timeseries",
       "targets": [
         {
           "expr": "jvm_memory_used_bytes{area=\"heap\", job=\"order-service\"}",
-          "legendFormat": "order-service — {{id}}",
+          "legendFormat": "order-service \u2014 {{id}}",
           "refId": "A"
         },
         {
           "expr": "jvm_memory_used_bytes{area=\"heap\", job=~\"event-service.*\"}",
-          "legendFormat": "event-service {{job}} — {{id}}",
+          "legendFormat": "event-service {{job}} \u2014 {{id}}",
           "refId": "B"
         },
         {
           "expr": "jvm_memory_used_bytes{area=\"heap\", job=\"notification-service\"}",
-          "legendFormat": "notification-service — {{id}}",
+          "legendFormat": "notification-service \u2014 {{id}}",
           "refId": "C"
         }
       ]
@@ -1152,7 +817,7 @@
           "sort": "none"
         }
       },
-      "title": "Threads JVM por serviço",
+      "title": "Threads JVM por servi\u00e7o",
       "type": "timeseries",
       "targets": [
         {
@@ -1162,7 +827,7 @@
         },
         {
           "expr": "sum by(job) (jvm_threads_live_threads{job=~\"event-service.*\"})",
-          "legendFormat": "event-service (ambas instâncias)",
+          "legendFormat": "event-service (ambas inst\u00e2ncias)",
           "refId": "B"
         },
         {
@@ -1212,7 +877,7 @@
           "sort": "none"
         }
       },
-      "title": "GC — Pausas por segundo",
+      "title": "GC \u2014 Pausas por segundo",
       "type": "timeseries",
       "targets": [
         {
@@ -1297,7 +962,7 @@
         "y": 61
       },
       "id": 105,
-      "title": "❤️ Health — Actuator dos serviços",
+      "title": "Health \u2014 Actuator dos servi\u00e7os",
       "type": "row"
     },
     {
@@ -1313,13 +978,13 @@
           "mappings": [
             {
               "options": {
-                "0": {
-                  "text": "DOWN",
-                  "color": "red"
-                },
                 "1": {
                   "text": "UP",
                   "color": "green"
+                },
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
                 }
               },
               "type": "value"
@@ -1385,13 +1050,13 @@
           "mappings": [
             {
               "options": {
-                "0": {
-                  "text": "DOWN",
-                  "color": "red"
-                },
                 "1": {
                   "text": "UP",
                   "color": "green"
+                },
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
                 }
               },
               "type": "value"
@@ -1457,13 +1122,13 @@
           "mappings": [
             {
               "options": {
-                "0": {
-                  "text": "DOWN",
-                  "color": "red"
-                },
                 "1": {
                   "text": "UP",
                   "color": "green"
+                },
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
                 }
               },
               "type": "value"
@@ -1529,13 +1194,13 @@
           "mappings": [
             {
               "options": {
-                "0": {
-                  "text": "DOWN",
-                  "color": "red"
-                },
                 "1": {
                   "text": "UP",
                   "color": "green"
+                },
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
                 }
               },
               "type": "value"
@@ -1628,7 +1293,7 @@
           "sort": "none"
         }
       },
-      "title": "Uptime dos serviços (segundos desde o start)",
+      "title": "Uptime dos servi\u00e7os (segundos desde o start)",
       "type": "timeseries",
       "targets": [
         {
@@ -1666,7 +1331,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Ticket Application — Overview",
+  "title": "Ticket Application \u2014 Overview",
   "uid": "ticket-app-overview",
   "version": 1
 }
