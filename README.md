@@ -76,7 +76,7 @@ docker compose logs -f order-service
 curl -X POST http://localhost:8090/admin/mode -H "Content-Type: application/json" -d '{"failureRate":0.0}'
 ```
 
-The full command reference, covering every endpoint, auth/role failure cases, idempotency, DLQ, and the error-code catalogue, is in ​**[Guide.md](/docs/Reference-Sheet.md)**​.
+The full command reference, covering every endpoint, auth/role failure cases, idempotency, DLQ, and the error-code catalogue, is in ​[`Reference-Sheet.md`](/docs/Reference-Sheet.md)​.
 
 ## Useful Grafana queries
 
